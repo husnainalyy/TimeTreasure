@@ -87,7 +87,7 @@ const VerifyAccount = () => {
                         />
                         {errors.code && <div className="error text-red-800 text-xs font-bold">{errors.code}</div>}
                     </div>
-                    <Button disabled={isSubmitting} type="submit" id="loginSubmit" className="w-full flex justify-center items-center py-3 border font-semibold rounded-xl bg-slate-800 text-white hover:bg-gray-300">
+                    <Button disabled={isSubmitting} type="submit" id="loginSubmit" className="w-full flex justify-center items-center py-3 border font-semibold rounded-xl bg-red-600 text-white hover:bg-blue-900">
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
