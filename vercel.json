@@ -1,7 +1,8 @@
 {
-    "functions": {
-        "api/sendCapsuleEmails/route": {
-            "cron": "*/5 * * * *"
+    "crons": [
+        {
+            "path": "api/sendCapsuleEmails/route",
+            "schedule": "0 12 * * *"
         }
-    }
+    ]
 }
