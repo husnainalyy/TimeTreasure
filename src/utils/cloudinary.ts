@@ -1,11 +1,10 @@
-// src/utils/cloudinary.ts
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
 cloudinary.config({
-    CLOUD_NAME: process.env.CLOUD_NAME,
-    API_KEY: process.env.API_KEY,
-    API_SECRET: process.env.API_SECRET,
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
 });
 
 interface UploadResult {
@@ -13,14 +12,10 @@ interface UploadResult {
     url: string;
 }
 
-const uploads = (file: string, folder: string): Promise<UploadResult> => {
+const uploads = (file: Buffer, folder: string): Promise<UploadResult> => {
     return new Promise<UploadResult>((resolve, reject) => {
-        cloudinary.uploader.upload(
-            file,
-            {
-                resource_type: "auto",
-                folder: folder
-            },
+        cloudinary.uploader.upload_stream(
+            { resource_type: "auto", folder: folder },
             (error, result) => {
                 if (error) {
                     reject(error);
@@ -31,7 +26,7 @@ const uploads = (file: string, folder: string): Promise<UploadResult> => {
                     });
                 }
             }
-        );
+        ).end(file); // End the stream with the file buffer
     });
 };
 
