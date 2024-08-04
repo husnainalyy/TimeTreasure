@@ -5,6 +5,8 @@ import TimeCapsule from '@/models/timeCapsules.model';
 import { sendCapsuleOpeningEmail } from '@/helpers/sendCapsuleOpeningEmail';
 
 export async function POST(req: NextRequest) {
+        console.log('Cron job triggered');
+        console.log('Cron job has started.');
     try {
         await dbConnect();
         console.log("Database connected");
