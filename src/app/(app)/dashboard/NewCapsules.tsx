@@ -42,50 +42,51 @@ const NewCapsules = () => {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        setIsCreatingCapsule(true);
-        e.preventDefault();
-        const session = await getSession();
-        if (!session) {
-            console.log('User not logged in');
-            setIsCreatingCapsule(false);
-            return;
-        }
+    setIsCreatingCapsule(true);
+    e.preventDefault();
+    const session = await getSession();
+    if (!session) {
+        console.log('User not logged in');
+        setIsCreatingCapsule(false);
+        return;
+    }
 
-        const data = new FormData();
-        data.append('subject', formData.subject);
-        data.append('message', formData.body);
-        data.append('creationDate', new Date().toLocaleDateString('en-CA'));
-        data.append('deliveryDate', formData.date); // Ensure format YYYY-MM-DD
-        data.append('email', formData.email);
-        if (formData.file) data.append('file', formData.file);
+    const data = new FormData();
+    data.append('subject', formData.subject);
+    data.append('message', formData.body);
+    data.append('creationDate', new Date().toLocaleDateString('en-CA'));
+    data.append('deliveryDate', formData.date); // Ensure format YYYY-MM-DD
+    data.append('email', formData.email);
+    if (formData.file) data.append('file', formData.file);
 
-        try {
-            const response = await axios.post('/api/capsule/createCapsule', data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-
-            if (response.status !== 201) {
-                throw new Error('Failed to create capsule');
+    try {
+        const response = await axios.post('/api/capsule/createCapsule', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
             }
+        });
 
-            toast({
-                title: 'Success',
-                description: 'You have successfully created a capsule.',
-            });
-            console.log('Capsule created successfully', response.data);
-        } catch (error: any) {
-            console.error('An error occurred while submitting the form', error.response?.data || error.message);
-            toast({
-                title: 'Error',
-                description: 'Failed to create capsule.',
-                variant: 'destructive',
-            });
-        } finally {
-            setIsCreatingCapsule(false);
+        if (response.status !== 201) {
+            throw new Error('Failed to create capsule');
         }
-    };
+
+        toast({
+            title: 'Success',
+            description: 'You have successfully created a capsule.',
+        });
+        console.log('Capsule created successfully', response.data);
+    } catch (error: any) {
+        console.error('An error occurred while submitting the form', error.response?.data || error.message);
+        toast({
+            title: 'Error',
+            description: 'Failed to create capsule.',
+            variant: 'destructive',
+        });
+    } finally {
+        setIsCreatingCapsule(false);
+    }
+};
+
 
     const inspirationalLines = [
         "Believe you can and you're halfway there.",
