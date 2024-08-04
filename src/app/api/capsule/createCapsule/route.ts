@@ -11,10 +11,11 @@ export async function POST(request: Request) {
     await dbConnect();
 
     try {
-        const cookie = request.headers.get('cookie')||'';
+        const cookie = request.headers.get('cookie') || '';
         const session = await getSession({ req: { headers: { cookie } } });
 
         if (!session || !session.user._id) {
+            console.log("User session missing or invalid", session); // Log session details
             return NextResponse.json({ message: "User ID is missing" }, { status: 401 });
         }
 
@@ -64,11 +65,12 @@ export async function POST(request: Request) {
             owner,
         });
 
-        console.log(capsule);
+        console.log("Created Capsule:", capsule);
         await UserModel.findByIdAndUpdate(owner, { $push: { timeCapsules: capsule._id } });
 
         const createdCapsule = await TimeCapsule.findById(capsule._id).populate('owner');
         if (!createdCapsule) {
+            console.log("Capsule not found after creation");
             return NextResponse.json({ message: "Something went wrong while creating the capsule" }, { status: 500 });
         }
         
@@ -77,5 +79,4 @@ export async function POST(request: Request) {
         console.error("Error creating capsule:", error);
         return NextResponse.json({ message: "Failed to create capsule" }, { status: 500 });
     }
-
 }
