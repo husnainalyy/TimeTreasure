@@ -1,37 +1,26 @@
+// middleware.ts (or .js)
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export { default } from 'next-auth/middleware';
-import { getToken } from 'next-auth/jwt';
+export function middleware(request: NextRequest) {
+    const url = request.nextUrl.clone();
+    const isAuthenticated = !!request.cookies.get('authToken'); // Adjust based on how you manage authentication
 
-export const config = {
-    matcher: [
-        '/signIn',
-        '/signUp',
-        '/',
-        '/dashboard/:path*',
-        '/verify/:path*'
-    ],
-};
-
-export async function middleware(request: NextRequest) {
-    const token = await getToken({ req: request });
-    const url = request.nextUrl;
-
-    if (token && (url.pathname.startsWith('/signIn') ||
-        url.pathname.startsWith('/signUp') ||
-        url.pathname.startsWith('/verify') ||
-        url.pathname === '/')) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+    if (!isAuthenticated) {
+        // Redirect to login if not authenticated
+        url.pathname = '/login';
+        return NextResponse.redirect(url);
     }
 
-    if (!token && url.pathname.startsWith('/dashboard')) {
-        return NextResponse.redirect(new URL('/', request.url));
-    }
-
-    if (!token && url.pathname === '/') {
-        return NextResponse.next();
+    if (url.pathname === '/login' && isAuthenticated) {
+        // Redirect authenticated users away from the login page
+        url.pathname = '/dashboard';
+        return NextResponse.redirect(url);
     }
 
     return NextResponse.next();
 }
+
+export const config = {
+    matcher: ['/dashboard/:path*', '/login/:path*'], // Adjust to your routes
+};
