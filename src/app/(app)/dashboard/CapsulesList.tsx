@@ -126,22 +126,22 @@ const CapsuleList: React.FC = () => {
         <div className="p-4 md:p-6">
             <Table>
                 <TableHeader>
-                    <TableRow className='flex justify-between'>
-                        <TableHead className='hidden lg:block md:block'>Capsule ID</TableHead>
-                        <TableHead className=' lg:block md:block'>Heading</TableHead>
-                        <TableHead className=' lg:block md:block'>Creation Date</TableHead>
-                        <TableHead className=' lg:block md:block'>Delivery Date</TableHead>
-                        <TableHead className='hidden lg:block md:block'>Status</TableHead>
-                        <TableHead className='hidden lg:block md:block'>Actions</TableHead>
+                    <TableRow className=' '>
+                        <TableHead className='hidden lg:flex lg:items-center md:block lg:justify-start'>Capsule ID</TableHead>
+                        <TableHead className=' '>Heading</TableHead>
+                        <TableHead className='hidden lg:flex lg:items-center md:block lg:justify-start'>Creation Date</TableHead>
+                        <TableHead className='hidden lg:flex lg:items-center md:block lg:justify-start '>Delivery Date</TableHead>
+                        <TableHead className=''>Status</TableHead>
+                        <TableHead className=''>Actions</TableHead>
                     </TableRow>
-                </TableHeader>
+                </TableHeader>      
                 <TableBody>
                     {capsules.map((capsule) => (
                         <TableRow key={capsule._id}>
                             <TableCell className='hidden lg:block md:block'>{renderCapsuleId(capsule._id)}</TableCell>
                             <TableCell>{capsule.subject}</TableCell>
                             <TableCell className='hidden lg:block md:block'>{new Date(capsule.creationDate).toLocaleDateString()}</TableCell>
-                            <TableCell>{new Date(capsule.deliveryDate).toLocaleDateString()}</TableCell>
+                            <TableCell className='hidden lg:block md:block'>{new Date(capsule.deliveryDate).toLocaleDateString()}</TableCell>
                             <TableCell >
                                 <Badge variant={capsule.status === 'opened' ? 'default' : 'destructive'}>
                                     {capsule.status}
