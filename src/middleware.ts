@@ -18,14 +18,19 @@ export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request });
     const url = request.nextUrl;
 
+    console.log('Token:', token);
+    console.log('Request Path:', url.pathname);
+
     if (token && (url.pathname.startsWith('/signIn') ||
         url.pathname.startsWith('/signUp') ||
         url.pathname.startsWith('/verify') ||
         url.pathname === '/')) {
+        console.log('Redirecting to /dashboard');
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
     if (!token && url.pathname.startsWith('/dashboard')) {
+        console.log('Redirecting to /');
         return NextResponse.redirect(new URL('/', request.url));
     }
 
