@@ -3,8 +3,6 @@ import { UserModel } from "@/models/users.model";
 import { getSession } from "next-auth/react";
 import TimeCapsule from '@/models/timeCapsules.model';
 import { uploads } from "@/utils/cloudinary";
-import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -15,7 +13,6 @@ export async function POST(request: Request) {
         const session = await getSession({ req: { headers: { cookie } } });
 
         if (!session || !session.user._id) {
-            console.log("User session missing or invalid", session); // Log session details
             return NextResponse.json({ message: "User ID is missing" }, { status: 401 });
         }
 
@@ -36,18 +33,10 @@ export async function POST(request: Request) {
             const file = files[0];
             const buffer = Buffer.from(await file.arrayBuffer());
 
-            const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-            if (!fs.existsSync(uploadsDir)) {
-                fs.mkdirSync(uploadsDir, { recursive: true });
-            }
-
-            const filePath = path.join(uploadsDir, file.name);
-            fs.writeFileSync(filePath, buffer);
-
+            // Upload directly to Cloudinary
             try {
-                const fileResponse = await uploads(filePath, 'Images');
+                const fileResponse = await uploads(buffer, 'Uploads'); // Pass the buffer instead of file path
                 fileUrl = fileResponse.url;
-                fs.unlinkSync(filePath);
             } catch (uploadError) {
                 console.error("Upload error:", uploadError);
                 return NextResponse.json({ message: "Failed to upload file" }, { status: 500 });
@@ -59,18 +48,17 @@ export async function POST(request: Request) {
             message,
             fileUrl: fileUrl ? [fileUrl] : [],
             creationDate,
-            deliveryDate: deliveryDate,
+            deliveryDate,
             audience,
             email,
             owner,
         });
 
-        console.log("Created Capsule:", capsule);
+        console.log(capsule);
         await UserModel.findByIdAndUpdate(owner, { $push: { timeCapsules: capsule._id } });
 
         const createdCapsule = await TimeCapsule.findById(capsule._id).populate('owner');
         if (!createdCapsule) {
-            console.log("Capsule not found after creation");
             return NextResponse.json({ message: "Something went wrong while creating the capsule" }, { status: 500 });
         }
         
