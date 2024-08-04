@@ -127,21 +127,21 @@ const CapsuleList: React.FC = () => {
             <Table>
                 <TableHeader>
                     <TableRow className=' '>
-                        <TableHead className='hidden lg:flex lg:items-center md:block lg:justify-start'>Capsule ID</TableHead>
+                        <TableHead className='hidden lg:table-cell md:table-cell '>Capsule ID</TableHead>
                         <TableHead className=' '>Heading</TableHead>
-                        <TableHead className='hidden lg:flex lg:items-center md:block lg:justify-start'>Creation Date</TableHead>
-                        <TableHead className='hidden lg:flex lg:items-center md:block lg:justify-start '>Delivery Date</TableHead>
+                        <TableHead className='hidden lg:table-cell md:table-cell'>Creation Date</TableHead>
+                        <TableHead className='hidden lg:table-cell md:table-cell '>Delivery Date</TableHead>
                         <TableHead className=''>Status</TableHead>
                         <TableHead className=''>Actions</TableHead>
                     </TableRow>
                 </TableHeader>      
                 <TableBody>
                     {capsules.map((capsule) => (
-                        <TableRow key={capsule._id}>
-                            <TableCell className='hidden lg:block md:block'>{renderCapsuleId(capsule._id)}</TableCell>
+                        <TableRow key={capsule._id} className=''>
+                            <TableCell className='hidden lg:table-cell md:table-cell'>{renderCapsuleId(capsule._id)}</TableCell>
                             <TableCell>{capsule.subject}</TableCell>
-                            <TableCell className='hidden lg:block md:block'>{new Date(capsule.creationDate).toLocaleDateString()}</TableCell>
-                            <TableCell className='hidden lg:block md:block'>{new Date(capsule.deliveryDate).toLocaleDateString()}</TableCell>
+                            <TableCell className='hidden lg:table-cell md:table-cell'>{new Date(capsule.creationDate).toLocaleDateString()}</TableCell>
+                            <TableCell className='hidden lg:table-cell md:table-cell'>{new Date(capsule.deliveryDate).toLocaleDateString()}</TableCell>
                             <TableCell >
                                 <Badge variant={capsule.status === 'opened' ? 'default' : 'destructive'}>
                                     {capsule.status}
@@ -172,7 +172,7 @@ const CapsuleList: React.FC = () => {
                     ))}
                 </TableBody>
             </Table>
-
+            
             {selectedCapsule && selectedUser && (
                 <Modal
                     open={showModal}
