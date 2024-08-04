@@ -126,13 +126,13 @@ const CapsuleList: React.FC = () => {
         <div className="p-4 md:p-6">
             <Table>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow className='flex justify-between'>
                         <TableHead className='hidden lg:block md:block'>Capsule ID</TableHead>
-                        <TableHead>Heading</TableHead>
-                        <TableHead className='hidden lg:block md:block'>Creation Date</TableHead>
-                        <TableHead>Delivery Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead className=' lg:block md:block'>Heading</TableHead>
+                        <TableHead className=' lg:block md:block'>Creation Date</TableHead>
+                        <TableHead className=' lg:block md:block'>Delivery Date</TableHead>
+                        <TableHead className='hidden lg:block md:block'>Status</TableHead>
+                        <TableHead className='hidden lg:block md:block'>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
