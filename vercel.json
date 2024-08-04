@@ -1,0 +1,7 @@
+{
+    "functions": {
+        "api/sendCapsuleEmails/route": {
+            "cron": "*/5 * * * *"
+        }
+    }
+}
