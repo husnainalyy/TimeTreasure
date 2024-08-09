@@ -29,14 +29,15 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
         const capsules: TimeCapsuleDocument[] = await TimeCapsule.find({ owner: session.user._id }).lean();
 
+        // Use UTC for today’s date
         const today = new Date();
-        today.setHours(13, 0, 0, 0); // Normalize to start of the day
+        today.setUTCHours(13, 0, 0, 0); // Set to 1 PM UTC
 
         console.log('Today’s date:', today.toDateString()); // Debugging log
 
         const updatedCapsules = capsules.map((capsule: TimeCapsuleDocument) => {
             const deliveryDate = new Date(capsule.deliveryDate);
-            deliveryDate.setHours(0, 0, 0, 0); // Normalize to start of the day
+            deliveryDate.setUTCHours(0, 0, 0, 0); // Normalize to start of the day in UTC
 
             console.log('Processing capsule:', capsule._id);
             console.log('Delivery date:', deliveryDate.toDateString());
