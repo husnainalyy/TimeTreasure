@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         const capsules: TimeCapsuleDocument[] = await TimeCapsule.find({ owner: session.user._id }).lean();
 
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize to start of the day
+        today.setHours(13, 0, 0, 0); // Normalize to start of the day
 
         console.log('Today’s date:', today.toDateString()); // Debugging log
 
