@@ -9,8 +9,8 @@ interface TimeCapsuleDocument {
     subject: string;
     message: string;
     fileUrl: string[];
-    creationDate: Date;
-    deliveryDate: Date;
+    creationDate: string;  // Keep as string
+    deliveryDate: string;  // Keep as string
     email: string;
     owner: string;
     createdAt: Date;
@@ -22,21 +22,41 @@ interface TimeCapsuleDocument {
 export async function GET(req: NextRequest, res: NextResponse) {
     await dbConnect();
     try {
+        console.log('Fetching session...');
         const session = await getServerSession(authOptions);
         if (!session || !session.user) {
+            console.log('Unauthorized access');
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
+        console.log('Session found:', session.user);
 
+        console.log('Fetching capsules for owner:', session.user._id);
         const capsules: TimeCapsuleDocument[] = await TimeCapsule.find({ owner: session.user._id }).lean();
+        console.log('Capsules fetched:', capsules);
 
         const today = new Date();
+        today.setHours(0, 0, 0, 0);  // Normalize to start of the day
+        console.log('Today’s date:', today.toDateString());
+
         const updatedCapsules = capsules.map((capsule: TimeCapsuleDocument) => {
+            console.log('Processing capsule:', capsule._id);
+
+            // Convert string dates to Date objects
             const deliveryDate = new Date(capsule.deliveryDate);
+            deliveryDate.setHours(0, 0, 0, 0);  // Normalize to start of the day
+
+            console.log('Delivery date:', deliveryDate.toDateString());
+
             const status = deliveryDate.toDateString() === today.toDateString() || deliveryDate < today
                 ? 'opened'
                 : 'pending';
+
+            console.log('Capsule status:', status);
+
             return { ...capsule, status };
         });
+
+        console.log('Updated capsules:', updatedCapsules);
 
         return NextResponse.json(updatedCapsules, { status: 200 });
     } catch (error) {
