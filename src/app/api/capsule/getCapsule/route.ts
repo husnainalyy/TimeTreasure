@@ -19,27 +19,6 @@ interface TimeCapsuleDocument {
     status?: string;
 }
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import { dbConnect } from '@/lib/dbConnect';
-import TimeCapsule from '@/models/timeCapsules.model';
-
-interface TimeCapsuleDocument {
-    _id: string;
-    subject: string;
-    message: string;
-    fileUrl: string[];
-    creationDate: string;  // Keep as string
-    deliveryDate: string;  // Keep as string
-    email: string;
-    owner: string;
-    createdAt: Date;
-    updatedAt: Date;
-    __v: number;
-    status?: string;
-}
-
 export async function GET(req: NextRequest, res: NextResponse) {
     await dbConnect();
     try {
