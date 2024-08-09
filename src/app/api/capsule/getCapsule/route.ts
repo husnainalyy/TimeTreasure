@@ -31,16 +31,16 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
         // Use UTC for today’s date
         const today = new Date();
-        today.setUTCHours(13, 0, 0, 0); // Set to 1 PM UTC
+        today.setUTCHours(0, 0, 0, 0); // Normalize to start of the day in UTC
 
-        console.log('Today’s date:', today.toDateString()); // Debugging log
+        console.log('Today’s date:', today.toISOString()); // Debugging log
 
         const updatedCapsules = capsules.map((capsule: TimeCapsuleDocument) => {
             const deliveryDate = new Date(capsule.deliveryDate);
             deliveryDate.setUTCHours(0, 0, 0, 0); // Normalize to start of the day in UTC
 
             console.log('Processing capsule:', capsule._id);
-            console.log('Delivery date:', deliveryDate.toDateString());
+            console.log('Delivery date:', deliveryDate.toISOString());
 
             let status: string;
 
