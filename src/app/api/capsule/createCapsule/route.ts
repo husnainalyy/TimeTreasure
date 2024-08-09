@@ -5,31 +5,66 @@ import TimeCapsule from '@/models/timeCapsules.model';
 import { uploads } from "@/utils/cloudinary";
 import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function POST(request: Request) {
     await dbConnect();
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session || !session.user) {
-            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+        const cookie = request.headers.get('cookie') || '';
+        const session = await getSession({ req: { headers: { cookie } } });
+
+        if (!session || !session.user._id) {
+            return NextResponse.json({ message: "User ID is missing" }, { status: 401 });
         }
 
-        const capsules: TimeCapsuleDocument[] = await TimeCapsule.find({ owner: session.user._id }).lean();
+        const formData = await request.formData();
+        const files = formData.getAll('file') as File[];
+        const { subject, message, creationDate, deliveryDate, audience, email } = Object.fromEntries(formData.entries()) as any;
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize to start of the day
+        console.log("Form Data:", { subject, message, creationDate, deliveryDate, audience, email });
 
-        const updatedCapsules = capsules.map((capsule: TimeCapsuleDocument) => {
-            const deliveryDate = new Date(capsule.deliveryDate);
-            deliveryDate.setHours(0, 0, 0, 0); // Normalize to start of the day
+        if ([subject, message, audience, email].some((field) => !String(field)?.trim())) {
+            return NextResponse.json({ message: "All fields are required" }, { status: 400 });
+        }
 
-            const status = deliveryDate <= today ? 'opened' : 'pending';
-            return { ...capsule, status };
+        const owner = session.user._id;
+        let fileUrl: string | null = null;
+
+        if (files.length > 0) {
+            const file = files[0];
+            const buffer = Buffer.from(await file.arrayBuffer());
+
+            // Upload directly to Cloudinary
+            try {
+                const fileResponse = await uploads(buffer, 'Uploads'); // Pass the buffer instead of file path
+                fileUrl = fileResponse.url;
+            } catch (uploadError) {
+                console.error("Upload error:", uploadError);
+                return NextResponse.json({ message: "Failed to upload file" }, { status: 500 });
+            }
+        }
+
+        const capsule = await TimeCapsule.create({
+            subject,
+            message,
+            fileUrl: fileUrl ? [fileUrl] : [],
+            creationDate,
+            deliveryDate,
+            audience,
+            email,
+            owner,
         });
 
-        console.log('Updated capsules:', updatedCapsules); // Debugging log
-        return NextResponse.json(updatedCapsules, { status: 200 });
+        console.log(capsule);
+        await UserModel.findByIdAndUpdate(owner, { $push: { timeCapsules: capsule._id } });
+
+        const createdCapsule = await TimeCapsule.findById(capsule._id).populate('owner');
+        if (!createdCapsule) {
+            return NextResponse.json({ message: "Something went wrong while creating the capsule" }, { status: 500 });
+        }
+
+        return NextResponse.json({ data: createdCapsule, message: "Capsule created successfully" }, { status: 201 });
     } catch (error) {
-        console.error('Error fetching capsules:', error);
-        return NextResponse.json({ message: 'Failed to fetch capsules' }, { status: 500 });
+        console.error("Error creating capsule:", error);
+        return NextResponse.json({ message: "Failed to create capsule" }, { status: 500 });
     }
 }
