@@ -43,12 +43,16 @@ export async function POST(request: Request) {
             }
         }
 
+        // Convert creationDate and deliveryDate to UTC
+        const utcCreationDate = new Date(creationDate).toISOString();
+        const utcDeliveryDate = new Date(deliveryDate).toISOString();
+
         const capsule = await TimeCapsule.create({
             subject,
             message,
             fileUrl: fileUrl ? [fileUrl] : [],
-            creationDate,
-            deliveryDate,
+            creationDate: utcCreationDate,
+            deliveryDate: utcDeliveryDate,
             audience,
             email,
             owner,
