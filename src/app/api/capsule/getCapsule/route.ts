@@ -3,14 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import { dbConnect } from '@/lib/dbConnect';
 import TimeCapsule from '@/models/timeCapsules.model';
-
 interface TimeCapsuleDocument {
     _id: string;
     subject: string;
     message: string;
     fileUrl: string[];
-    creationDate: string;  // Keep as string
-    deliveryDate: string;  // Keep as string
+    creationDate: Date;
+    deliveryDate: Date;
     email: string;
     owner: string;
     createdAt: Date;
@@ -18,7 +17,6 @@ interface TimeCapsuleDocument {
     __v: number;
     status?: string;
 }
-
 export async function GET(req: NextRequest, res: NextResponse) {
     await dbConnect();
     try {
@@ -29,31 +27,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
         const capsules: TimeCapsuleDocument[] = await TimeCapsule.find({ owner: session.user._id }).lean();
 
-        // Use UTC for today’s date
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0); // Normalize to start of the day in UTC
-
-        console.log('Today’s date:', today.toISOString()); // Debugging log
-
         const updatedCapsules = capsules.map((capsule: TimeCapsuleDocument) => {
             const deliveryDate = new Date(capsule.deliveryDate);
-            deliveryDate.setUTCHours(0, 0, 0, 0); // Normalize to start of the day in UTC
-
-            console.log('Processing capsule:', capsule._id);
-            console.log('Delivery date:', deliveryDate.toISOString());
-
-            let status: string;
-
-            if (deliveryDate > today) {
-                status = 'pending';
-            } else {
-                status = 'opened';
-            }
-
+            const status = deliveryDate.toDateString() === today.toDateString() || deliveryDate < today
+                ? 'opened'
+                : 'pending';
             return { ...capsule, status };
         });
-
-        console.log('Updated capsules:', updatedCapsules); // Debugging log
 
         return NextResponse.json(updatedCapsules, { status: 200 });
     } catch (error) {
