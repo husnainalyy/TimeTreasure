@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/dbConnect'; // Ensure this is imported
 import { getSession } from "next-auth/react";
 import TimeCapsule from '@/models/timeCapsules.model';
-import UserModel from '@/models/users.model';
+import { UserModel } from '@/models/users.model';
 
 export async function POST(request: Request) {
     await dbConnect(); // Connect to the database
