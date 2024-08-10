@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import { dbConnect } from '@/lib/dbConnect';
 import TimeCapsule from '@/models/timeCapsules.model';
+
 interface TimeCapsuleDocument {
     _id: string;
     subject: string;
@@ -17,6 +18,7 @@ interface TimeCapsuleDocument {
     __v: number;
     status?: string;
 }
+
 export async function GET(req: NextRequest, res: NextResponse) {
     await dbConnect();
     try {
