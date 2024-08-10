@@ -1,7 +1,7 @@
 {
     "crons": [
         {
-            "path": "src/app/api/sendCapsuleEmails/route",
+            "path": "/src/app/api/sendCapsuleEmails/route",
             "schedule": "0 12 * * *"
         }
     ]
