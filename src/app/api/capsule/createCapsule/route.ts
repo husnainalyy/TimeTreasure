@@ -3,15 +3,13 @@ import { UserModel } from "@/models/users.model";
 import { getSession } from "next-auth/react";
 import TimeCapsule from '@/models/timeCapsules.model';
 import { uploads } from "@/utils/cloudinary";
-import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     await dbConnect();
 
     try {
-        const cookie = request.headers.get('cookie')||'';
+        const cookie = request.headers.get('cookie') || '';
         const session = await getSession({ req: { headers: { cookie } } });
 
         if (!session || !session.user._id) {
@@ -35,18 +33,10 @@ export async function POST(request: Request) {
             const file = files[0];
             const buffer = Buffer.from(await file.arrayBuffer());
 
-            const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-            if (!fs.existsSync(uploadsDir)) {
-                fs.mkdirSync(uploadsDir, { recursive: true });
-            }
-
-            const filePath = path.join(uploadsDir, file.name);
-            fs.writeFileSync(filePath, buffer);
-
+            // Upload directly to Cloudinary
             try {
-                const fileResponse = await uploads(filePath, 'Images');
+                const fileResponse = await uploads(buffer, 'Uploads'); // Pass the buffer instead of file path
                 fileUrl = fileResponse.url;
-                fs.unlinkSync(filePath);
             } catch (uploadError) {
                 console.error("Upload error:", uploadError);
                 return NextResponse.json({ message: "Failed to upload file" }, { status: 500 });
@@ -58,7 +48,7 @@ export async function POST(request: Request) {
             message,
             fileUrl: fileUrl ? [fileUrl] : [],
             creationDate,
-            deliveryDate: deliveryDate,
+            deliveryDate,
             audience,
             email,
             owner,
@@ -71,11 +61,10 @@ export async function POST(request: Request) {
         if (!createdCapsule) {
             return NextResponse.json({ message: "Something went wrong while creating the capsule" }, { status: 500 });
         }
-        
+
         return NextResponse.json({ data: createdCapsule, message: "Capsule created successfully" }, { status: 201 });
     } catch (error) {
         console.error("Error creating capsule:", error);
         return NextResponse.json({ message: "Failed to create capsule" }, { status: 500 });
     }
-
 }
