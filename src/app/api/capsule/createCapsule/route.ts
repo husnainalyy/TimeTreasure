@@ -1,8 +1,12 @@
 import { uploads } from "@/utils/cloudinary";
 import { NextResponse } from 'next/server';
+import { dbConnect } from '@/lib/dbConnect'; // Ensure this is imported
+import { getSession } from "next-auth/react";
+import TimeCapsule from '@/models/timeCapsules.model';
+import UserModel from '@/models/users.model';
 
 export async function POST(request: Request) {
-    await dbConnect();
+    await dbConnect(); // Connect to the database
 
     try {
         const cookie = request.headers.get('cookie') || '';
@@ -29,9 +33,9 @@ export async function POST(request: Request) {
             const file = files[0];
             const buffer = Buffer.from(await file.arrayBuffer());
 
-            // Upload directly to Cloudinary
             try {
-                const fileResponse = await uploads(buffer, 'Uploads'); // Pass the buffer instead of file path
+                // Upload directly to Cloudinary
+                const fileResponse = await uploads(buffer, 'Uploads'); // Pass the buffer directly
                 fileUrl = fileResponse.url;
             } catch (uploadError) {
                 console.error("Upload error:", uploadError);
